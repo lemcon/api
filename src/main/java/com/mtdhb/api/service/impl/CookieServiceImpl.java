@@ -84,6 +84,9 @@ public class CookieServiceImpl implements CookieService {
         }).map(cookie -> {
             CookieDTO cookieDTO = new CookieDTO();
             BeanUtils.copyProperties(cookie, cookieDTO);
+            if (cookie.getApplication().equals(ThirdPartyApplication.MEITUAN) || cookie.getValid()) {
+                cookieDTO.setValue(null);
+            }
             return cookieDTO;
         }).collect(Collectors.toList());
         return cookieDTOs;
@@ -148,6 +151,7 @@ public class CookieServiceImpl implements CookieService {
         cookie.setOpenId(openId);
         cookie.setNickname(Entities.encodeNickname(cookieCheckDTO.getNickname()));
         cookie.setHeadImgUrl(cookieCheckDTO.getHeadimgurl());
+        cookie.setValid(true);
         cookie.setUserId(userId);
         cookie.setGmtCreate(Timestamp.from(Instant.now()));
         cookieRepository.save(cookie);
@@ -191,6 +195,11 @@ public class CookieServiceImpl implements CookieService {
             }
             cookieRepository.delete(cookie);
         }
+    }
+
+    @Override
+    public void delete(ThirdPartyApplication application, boolean valid, long userId) {
+        cookieRepository.deleteByApplicationAndValidAndUserId(application, valid, userId);
     }
 
 }

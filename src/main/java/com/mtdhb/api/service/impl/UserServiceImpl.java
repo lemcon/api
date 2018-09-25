@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public NumberDTO getNumber(ThirdPartyApplication application, long userId) {
-        long total = cookieRepository.countByApplicationAndUserId(application, userId)
+        long total = cookieRepository.countByApplicationAndValidAndUserId(application, true, userId)
                 * thirdPartyApplicationProperties.getDailies()[application.ordinal()];
         long used = cookieUseCountRepository.countByStatusAndApplicationAndReceivingUserIdAndGmtCreateGreaterThan(
                 CookieUseStatus.SUCCESS, application, userId, Timestamp.valueOf(LocalDate.now().atStartOfDay()));

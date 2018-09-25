@@ -8,6 +8,7 @@ CREATE TABLE `cookie` (
   `open_id` varchar(64) NOT NULL,
   `nickname` varchar(128) DEFAULT NULL,
   `head_img_url` varchar(512) DEFAULT NULL,
+  `is_valid` tinyint(1) NOT NULL,
   `user_id` bigint(20) NOT NULL,
   `gmt_create` datetime NOT NULL,
   `gmt_modified` datetime DEFAULT NULL,

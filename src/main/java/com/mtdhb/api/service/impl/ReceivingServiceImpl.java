@@ -30,6 +30,7 @@ import com.mtdhb.api.constant.e.ErrorCode;
 import com.mtdhb.api.constant.e.ReceivingStatus;
 import com.mtdhb.api.constant.e.ReceivingType;
 import com.mtdhb.api.constant.e.ThirdPartyApplication;
+import com.mtdhb.api.dao.CookieRepository;
 import com.mtdhb.api.dao.CookieUseCountRepository;
 import com.mtdhb.api.dao.ReceivingRepository;
 import com.mtdhb.api.dto.ReceivingCarouselDTO;
@@ -72,6 +73,8 @@ public class ReceivingServiceImpl implements ReceivingService {
     private NodejsService nodejsService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private CookieRepository cookieRepository;
     @Autowired
     private CookieUseCountRepository cookieUseCountRepository;
     @Autowired
@@ -316,27 +319,37 @@ public class ReceivingServiceImpl implements ReceivingService {
         List<CookieUseCount> cookieUseCounts = cookieUseStatusDTOs.stream().map(cookieUseStatusDTO -> {
             long cookieId = cookieUseStatusDTO.getId();
             CookieUseStatus status = CookieUseStatus.values()[cookieUseStatusDTO.getStatus()];
-            if (status.equals(CookieUseStatus.SUCCESS)) {
-                cookieUseSuccessCount.incrementAndGet();
-            }
-            Cookie cookie = cookiesToMap.remove(cookieId);
-            String openId = cookie.getOpenId();
-            long n = usage.remove(openId) + 1L;
-            if (n < thirdPartyApplicationProperties.getDailies()[application.ordinal()]) {
-                usage.put(openId, n);
-                // 未达到每人每天可以领红包的次数的 cookie 放回队列
-                queue.offer(cookie);
-            }
             CookieUseCount cookieUseCount = new CookieUseCount();
             cookieUseCount.setStatus(status);
             cookieUseCount.setApplication(application);
-            cookieUseCount.setOpenId(openId);
             cookieUseCount.setCookieId(cookieId);
-            cookieUseCount.setCookieUserId(cookie.getUserId());
             cookieUseCount.setReceivingId(receiving.getId());
             cookieUseCount.setReceivingUserId(receiving.getUserId());
             cookieUseCount.setGmtCreate(timestamp);
             return cookieUseCount;
+        }).peek(cookieUseCount -> {
+            Cookie cookie = cookiesToMap.remove(cookieUseCount.getCookieId());
+            String openId = cookie.getOpenId();
+            cookieUseCount.setOpenId(openId);
+            cookieUseCount.setCookieUserId(cookie.getUserId());
+            long n = usage.remove(openId) + 1L;
+            if (n < thirdPartyApplicationProperties.getDailies()[application.ordinal()]
+                    && !cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
+                usage.put(openId, n);
+                // 未达到每人每天可以领红包的次数的有效 cookie 放回队列
+                queue.offer(cookie);
+            }
+        }).peek(cookieUseCount -> {
+            if (cookieUseCount.getStatus().equals(CookieUseStatus.SUCCESS)) {
+                cookieUseSuccessCount.incrementAndGet();
+            }
+        }).peek(cookieUseCount -> {
+            if (cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
+                cookieRepository.findById(cookieUseCount.getCookieId()).ifPresent(cookie -> {
+                    cookie.setValid(false);
+                    cookieRepository.save(cookie);
+                });
+            }
         }).collect(Collectors.toList());
         // TODO 可更优化为 mysql native 批量插入
         cookieUseCountRepository.saveAll(cookieUseCounts);

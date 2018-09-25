@@ -117,7 +117,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/cookie", method = RequestMethod.POST)
-    public Result cookie(@RequestParam("value") String value, @RequestParam("application") int application)
+    public Result saveCookie(@RequestParam("value") String value, @RequestParam("application") int application)
             throws IOException {
         UserDTO userDTO = RequestContextHolder.get();
         long userId = userDTO.getId();
@@ -135,14 +135,22 @@ public class UserController {
     }
 
     @RequestMapping(value = "/cookie", method = RequestMethod.GET)
-    public Result cookie() {
+    public Result listCookie() {
         UserDTO userDTO = RequestContextHolder.get();
         long userId = userDTO.getId();
         return Results.success(cookieService.list(userId));
     }
 
+    @RequestMapping(value = "/cookie", method = RequestMethod.DELETE)
+    public Result deleteCookie() {
+        UserDTO userDTO = RequestContextHolder.get();
+        long userId = userDTO.getId();
+        cookieService.delete(ThirdPartyApplication.ELE, false, userId);
+        return Results.success(true);
+    }
+
     @RequestMapping(value = "/cookie/{cookieId}", method = RequestMethod.DELETE)
-    public Result cookie(@PathVariable("cookieId") long cookieId) {
+    public Result deleteCookie(@PathVariable("cookieId") long cookieId) {
         UserDTO userDTO = RequestContextHolder.get();
         long userId = userDTO.getId();
         cookieService.delete(cookieId, userId);

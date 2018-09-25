@@ -14,6 +14,7 @@ import lombok.Data;
 public class CookieDTO {
 
     private Long id;
+    private String value;
     private String nickname;
     private String headImgUrl;
     private ThirdPartyApplication application;

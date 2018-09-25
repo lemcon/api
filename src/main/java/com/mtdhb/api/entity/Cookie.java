@@ -2,6 +2,7 @@ package com.mtdhb.api.entity;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
@@ -32,6 +33,8 @@ public class Cookie {
     private String openId;
     private String nickname;
     private String headImgUrl;
+    @Column(name = "is_valid")
+    private Boolean valid;
     private Long userId;
     private Timestamp gmtCreate;
     private Timestamp gmtModified;

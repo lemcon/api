@@ -27,7 +27,7 @@ public interface CookieUseCountRepository extends CrudRepository<CookieUseCount,
             + " c.openId as openId, c.nickname as nickname, c.headImgUrl as headImgUrl,c.userId as userId,"
             + " c.gmtCreate as gmtCreate, c.gmtModified as gmtModified,"
             + " (select count(*) from CookieUseCount where openId=c.openId and gmtCreate>?4) as count"
-            + " from Cookie c where c.id<?1 and c.application=?2"
+            + " from Cookie c where c.valid=true and c.id<?1 and c.application=?2"
             + " and (select count(*) from CookieUseCount where openId=c.openId and gmtCreate>?4)<?3 "
             + " order by c.id desc")
     Slice<CookieUseCountView> findCookieUseCountView(long upper, ThirdPartyApplication application, long daily,

@@ -2,6 +2,8 @@ package com.mtdhb.api.dao;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -17,7 +19,7 @@ import com.mtdhb.api.entity.view.CookieRankView;
  */
 public interface CookieRepository extends CrudRepository<Cookie, Long> {
 
-    long countByApplicationAndUserId(ThirdPartyApplication application, long userId);
+    long countByApplicationAndValidAndUserId(ThirdPartyApplication application, boolean valid, long userId);
 
     Cookie findByOpenId(String openId);
 
@@ -25,7 +27,10 @@ public interface CookieRepository extends CrudRepository<Cookie, Long> {
 
     Cookie findByIdAndUserId(long id, long userId);
 
-    @Query("select c.userId as userId, count(*) as count from Cookie c where c.application=?1 group by c.userId order by count(*) desc, max(c.gmtCreate)")
+    @Query("select c.userId as userId, count(*) as count from Cookie c where c.valid=true and c.application=?1 group by c.userId order by count(*) desc, max(c.gmtCreate)")
     Page<CookieRankView> findCookieRankViewByApplication(ThirdPartyApplication application, Pageable pageable);
+    
+    @Transactional
+    void deleteByApplicationAndValidAndUserId(ThirdPartyApplication application, boolean valid, long userId);
 
 }

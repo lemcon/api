@@ -22,5 +22,7 @@ public interface CookieService {
     CookieDTO save(String value, ThirdPartyApplication application, long userId) throws IOException;
 
     void delete(long cookieId, long userId);
+    
+    void delete(ThirdPartyApplication application, boolean valid, long userId);
 
 }
