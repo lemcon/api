@@ -18,6 +18,7 @@ public class CookieDTO {
     private String nickname;
     private String headImgUrl;
     private ThirdPartyApplication application;
+    private Boolean valid;
     private Timestamp gmtCreate;
     private Timestamp gmtModified;
 
