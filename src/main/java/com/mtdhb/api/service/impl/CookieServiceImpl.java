@@ -149,9 +149,9 @@ public class CookieServiceImpl implements CookieService {
         if (application.equals(ThirdPartyApplication.ELE)) {
             cookie = cookieRepository.findByPhone(phone);
             if (cookie != null) {
-                throw new BusinessException(ErrorCode.COOKIE_EXIST,
-                        "cookieValue={}, application={}, userId={}, cookieCheckDTO={}", cookieValue, application,
-                        userId, cookieCheckDTO);
+                cookie.setPhone(null);
+                cookie.setValid(false);
+                cookieRepository.save(cookie);
             }
         }
         cookie = new Cookie();
