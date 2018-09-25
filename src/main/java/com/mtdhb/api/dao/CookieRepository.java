@@ -22,6 +22,8 @@ public interface CookieRepository extends CrudRepository<Cookie, Long> {
     long countByApplicationAndValidAndUserId(ThirdPartyApplication application, boolean valid, long userId);
 
     Cookie findByOpenId(String openId);
+    
+    Cookie findByPhone(String phone);
 
     List<Cookie> findByUserId(long userId);
 

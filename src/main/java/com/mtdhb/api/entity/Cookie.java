@@ -30,6 +30,7 @@ public class Cookie {
     private HttpService service;
     @Enumerated
     private ThirdPartyApplication application;
+    private String phone;
     private String openId;
     private String nickname;
     private String headImgUrl;

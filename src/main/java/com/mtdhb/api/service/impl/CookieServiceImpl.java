@@ -141,13 +141,24 @@ public class CookieServiceImpl implements CookieService {
         String openId = cookieCheckDTO.getOpenid();
         Cookie cookie = cookieRepository.findByOpenId(openId);
         if (cookie != null) {
-            throw new BusinessException(ErrorCode.COOKIE_EXIST, "cookieValue={}, application={}, userId={}",
-                    cookieValue, application, userId);
+            throw new BusinessException(ErrorCode.COOKIE_EXIST,
+                    "cookieValue={}, application={}, userId={}, cookieCheckDTO={}", cookieValue, application, userId,
+                    cookieCheckDTO);
+        }
+        String phone = cookieCheckDTO.getPhone();
+        if (application.equals(ThirdPartyApplication.ELE)) {
+            cookie = cookieRepository.findByPhone(phone);
+            if (cookie != null) {
+                throw new BusinessException(ErrorCode.COOKIE_EXIST,
+                        "cookieValue={}, application={}, userId={}, cookieCheckDTO={}", cookieValue, application,
+                        userId, cookieCheckDTO);
+            }
         }
         cookie = new Cookie();
         cookie.setValue(cookieValue);
         cookie.setService(HttpService.values()[cookieCheckDTO.getService()]);
         cookie.setApplication(application);
+        cookie.setPhone(phone);
         cookie.setOpenId(openId);
         cookie.setNickname(Entities.encodeNickname(cookieCheckDTO.getNickname()));
         cookie.setHeadImgUrl(cookieCheckDTO.getHeadimgurl());

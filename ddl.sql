@@ -5,6 +5,7 @@ CREATE TABLE `cookie` (
   `value` varchar(4096) NOT NULL,
   `service` tinyint(1) NOT NULL,
   `application` tinyint(1) NOT NULL,
+  `phone` varchar(11) DEFAULT NULL,
   `open_id` varchar(64) NOT NULL,
   `nickname` varchar(128) DEFAULT NULL,
   `head_img_url` varchar(512) DEFAULT NULL,
@@ -13,6 +14,7 @@ CREATE TABLE `cookie` (
   `gmt_create` datetime NOT NULL,
   `gmt_modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_phone` (`phone`),
   UNIQUE KEY `uk_open_id` (`open_id`),
   KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
